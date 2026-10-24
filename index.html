@@ -350,7 +350,39 @@
     </div>
 
   </section>
+<!-- DELIVERY ESTIMATOR -->
 
+<section class="card" id="delivery">
+
+  <h2>🚚 Delivery Cost Estimator</h2>
+
+  <p class="muted">
+    Enter the seller's and buyer's locations to estimate
+    the delivery distance and price.
+  </p>
+
+  <label>Seller location</label>
+  <input id="sellerLocation" type="text"
+         placeholder="e.g. Lagos, Nigeria">
+
+  <label>Buyer location</label>
+  <input id="buyerLocation" type="text"
+         placeholder="e.g. Port Harcourt, Nigeria">
+
+  <label>Package weight (kg)</label>
+  <input id="packageWeight" type="number"
+         min="0.1" value="1">
+
+  <button onclick="estimateDelivery()">
+    📍 Estimate Delivery
+  </button>
+
+  <div id="deliveryResult"
+       class="notice"
+       style="display:none; margin-top:15px;">
+  </div>
+
+</section>
 
   <!-- HOW IT WORKS -->
 
