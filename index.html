@@ -680,7 +680,82 @@ function payWithPaystack() {
 
 }
 
+async function estimateDelivery() {
+  const seller = document.getElementById("sellerLocation").value.trim();
+  const buyer = document.getElementById("buyerLocation").value.trim();
+  const weight = Number(document.getElementById("packageWeight").value) || 1;
+  const result = document.getElementById("deliveryResult");
 
+  if (!seller || !buyer) {
+    alert("Please enter both locations.");
+    return;
+  }
+
+  result.style.display = "block";
+  result.innerHTML = "📍 Calculating distance...";
+
+  try {
+    const sellerData = await geocode(seller);
+    const buyerData = await geocode(buyer);
+
+    const distance = await getDistance(sellerData, buyerData);
+
+    const baseFee = 1500;
+    const pricePerKm = 150;
+    const weightFee = Math.max(0, weight - 1) * 500;
+
+    const deliveryPrice =
+      baseFee + (distance * pricePerKm) + weightFee;
+
+    result.innerHTML =
+      "<strong>🚚 Delivery Estimate</strong><br><br>" +
+      "Seller: " + seller + "<br>" +
+      "Buyer: " + buyer + "<br>" +
+      "Distance: <strong>" +
+      distance.toFixed(1) + " km</strong><br>" +
+      "Estimated delivery: <strong>₦" +
+      deliveryPrice.toLocaleString() + "</strong>";
+
+  } catch (error) {
+    result.innerHTML =
+      "❌ Could not calculate the route. Try entering full locations.";
+  }
+}
+
+async function geocode(location) {
+  const response = await fetch(
+    "https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" +
+    encodeURIComponent(location)
+  );
+
+  const data = await response.json();
+
+  if (!data.length) {
+    throw new Error("Location not found");
+  }
+
+  return {
+    lat: Number(data[0].lat),
+    lon: Number(data[0].lon)
+  };
+}
+
+async function getDistance(from, to) {
+  const url =
+    "https://router.project-osrm.org/route/v1/driving/" +
+    from.lon + "," + from.lat + ";" +
+    to.lon + "," + to.lat +
+    "?overview=false";
+
+  const response = await fetch(url);
+  const data = await response.json();
+
+  if (!data.routes.length) {
+    throw new Error("Route not found");
+  }
+
+  return data.routes[0].distance / 1000;
+      }
 calculate();
 
 </script>
